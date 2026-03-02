@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { type Habit, getStreak, getWeeklyStats, getTotalCheckIns } from "./db";
 import { FireIcon } from "@heroicons/react/24/solid";
+import { HabitIcon } from "./icons";
+
+interface StreakInfo {
+  name: string;
+  streak: number;
+  color: string;
+  icon: string;
+}
 
 interface StatsBarProps {
   habits: Habit[];
@@ -8,8 +16,8 @@ interface StatsBarProps {
 }
 
 export default function StatsBar({ habits, refreshKey }: StatsBarProps) {
-  const [maxStreak, setMaxStreak] = useState(0);
-  const [maxStreakHabit, setMaxStreakHabit] = useState<string>("");
+  const [streaks, setStreaks] = useState<StreakInfo[]>([]);
+  const [streakIndex, setStreakIndex] = useState(0);
   const [weeklyRate, setWeeklyRate] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -17,18 +25,15 @@ export default function StatsBar({ habits, refreshKey }: StatsBarProps) {
     async function load() {
       if (habits.length === 0) return;
 
-      // Find max streak
-      let best = 0;
-      let bestName = "";
+      // Collect all streaks
+      const all: StreakInfo[] = [];
       for (const h of habits) {
         const s = await getStreak(h.id);
-        if (s > best) {
-          best = s;
-          bestName = h.name;
-        }
+        all.push({ name: h.name, streak: s, color: h.color, icon: h.emoji });
       }
-      setMaxStreak(best);
-      setMaxStreakHabit(bestName);
+      // Sort by streak descending so best is first
+      all.sort((a, b) => b.streak - a.streak);
+      setStreaks(all);
 
       // Weekly stats
       const weekly = await getWeeklyStats(habits);
@@ -43,7 +48,19 @@ export default function StatsBar({ habits, refreshKey }: StatsBarProps) {
     load();
   }, [habits, refreshKey]);
 
+  // Reset index when habits change
+  useEffect(() => {
+    setStreakIndex(0);
+  }, [habits.length]);
+
   if (habits.length === 0) return null;
+
+  const current = streaks[streakIndex % streaks.length] ?? null;
+
+  const cycleStreak = () => {
+    if (streaks.length <= 1) return;
+    setStreakIndex((i) => (i + 1) % streaks.length);
+  };
 
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -57,22 +74,47 @@ export default function StatsBar({ habits, refreshKey }: StatsBarProps) {
         </div>
       </div>
 
-      {/* Max streak */}
-      <div className="bg-[var(--color-card)] rounded-xl border border-[var(--color-border-subtle)] p-3 text-center">
-        <div className="flex items-center justify-center gap-1 mb-1">
-          <span className="text-[22px] font-bold tabular-nums text-[var(--color-text-primary)] leading-none">
-            {maxStreak}
-          </span>
-          {maxStreak >= 7 && (
-            <FireIcon
-              className="w-4 h-4"
-              style={{ color: "var(--color-streak-fire)" }}
-            />
-          )}
-        </div>
-        <div className="text-[11px] text-[var(--color-text-tertiary)] truncate">
-          {maxStreakHabit ? `${maxStreakHabit} 连续` : "最长连续"}
-        </div>
+      {/* Streak — clickable to cycle through habits */}
+      <div
+        onClick={cycleStreak}
+        className="bg-[var(--color-card)] rounded-xl border border-[var(--color-border-subtle)] p-3 text-center transition-all cursor-pointer hover:bg-[var(--color-border-subtle)]"
+      >
+        {current && (
+          <>
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <span className="text-[22px] font-bold tabular-nums leading-none" style={{ color: current.color }}>
+                {current.streak}
+              </span>
+              {current.streak >= 7 && (
+                <FireIcon
+                  className="w-4 h-4"
+                  style={{ color: "var(--color-streak-fire)" }}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <HabitIcon icon={current.icon} className="w-3 h-3" style={{ color: current.color }} />
+              <span className="text-[11px] text-[var(--color-text-tertiary)] truncate">
+                {current.name}
+              </span>
+            </div>
+            {streaks.length > 1 && (
+              <div className="flex items-center justify-center gap-0.5 mt-1">
+                {streaks.map((_, i) => (
+                  <span
+                    key={i}
+                    className="block w-1 h-1 rounded-full transition-colors"
+                    style={{
+                      backgroundColor: i === streakIndex % streaks.length
+                        ? "var(--color-accent)"
+                        : "var(--color-border)",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Total */}

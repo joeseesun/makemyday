@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   type Habit,
   getCheckInsForDate,
@@ -21,7 +21,9 @@ export default function TodayCard({
 }: TodayCardProps) {
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
   const [animatingId, setAnimatingId] = useState<number | null>(null);
+  const [confettiDone, setConfettiDone] = useState(false);
   const today = formatDate(new Date());
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const load = useCallback(async () => {
     const ids = await getCheckInsForDate(today);
@@ -32,11 +34,33 @@ export default function TodayCard({
     load();
   }, [load, refreshKey]);
 
+  const doneCount = checkedIds.length;
+  const totalCount = habits.length;
+  const allDone = totalCount > 0 && doneCount === totalCount;
+
+  // Hide confetti container after animation finishes
+  useEffect(() => {
+    if (allDone) {
+      setConfettiDone(false);
+      // Max delay ~1.38s + 2s duration = ~3.4s, round up
+      const t = setTimeout(() => setConfettiDone(true), 3500);
+      return () => clearTimeout(t);
+    }
+  }, [allDone]);
+
   const handleToggle = async (habitId: number) => {
     setAnimatingId(habitId);
+    // Optimistic UI: toggle locally immediately
+    setCheckedIds((prev) =>
+      prev.includes(habitId) ? prev.filter((id) => id !== habitId) : [...prev, habitId]
+    );
     await toggleCheckIn(today, habitId);
-    await load();
-    onDataChanged();
+    // Debounce stats refresh — wait 400ms after last toggle
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      load(); // sync actual DB state
+      onDataChanged();
+    }, 400);
     setTimeout(() => setAnimatingId(null), 300);
   };
 
@@ -49,10 +73,6 @@ export default function TodayCard({
       </div>
     );
   }
-
-  const doneCount = checkedIds.length;
-  const totalCount = habits.length;
-  const allDone = doneCount === totalCount;
 
   return (
     <div className="bg-[var(--color-card)] rounded-xl border border-[var(--color-border-subtle)] p-4">
@@ -157,12 +177,25 @@ export default function TodayCard({
         })}
       </div>
 
-      {/* All done message */}
-      {allDone && (
-        <div className="mt-3 pt-3 border-t border-[var(--color-border-subtle)] text-center">
-          <span className="text-xs font-medium text-[var(--color-accent)]">
-            All Done
-          </span>
+      {/* Confetti celebration when all done */}
+      {allDone && !confettiDone && (
+        <div className="mt-3 pt-3 border-t border-[var(--color-border-subtle)] relative overflow-hidden">
+          <div className="confetti-container">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <span
+                key={i}
+                className="confetti-piece"
+                style={{
+                  left: `${4 + (i / 24) * 92}%`,
+                  animationDelay: `${(i * 0.12) % 1.5}s`,
+                  backgroundColor: [
+                    'var(--color-accent)', '#f59e0b', '#ec4899',
+                    '#8b5cf6', '#06b6d4', '#ef4444',
+                  ][i % 6],
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

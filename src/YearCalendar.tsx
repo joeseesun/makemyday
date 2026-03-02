@@ -8,18 +8,18 @@ import {
 import { HabitIcon } from "./icons";
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 
-const MONTH_NAMES = [
+export const MONTH_NAMES = [
   "一月", "二月", "三月", "四月", "五月", "六月",
   "七月", "八月", "九月", "十月", "十一月", "十二月",
 ];
 const DAY_NAMES = ["日", "一", "二", "三", "四", "五", "六"];
 
-interface MonthData {
+export interface MonthData {
   month: number;
   days: (Date | null)[];
 }
 
-function generateYearCalendar(year: number): MonthData[] {
+export function generateYearCalendar(year: number): MonthData[] {
   const months: MonthData[] = [];
   for (let month = 0; month < 12; month++) {
     const firstDay = new Date(year, month, 1);
@@ -151,7 +151,7 @@ interface MonthGridProps {
   onToggle: (date: string, habitId: number) => void;
 }
 
-function MonthGrid({
+export function MonthGrid({
   monthData,
   monthName,
   habits,

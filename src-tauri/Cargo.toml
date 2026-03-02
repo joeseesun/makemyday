@@ -1,10 +1,10 @@
 [package]
-name = "app"
-version = "0.0.1"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+name = "makemyday"
+version = "0.1.0"
+description = "A minimal and beautiful habit tracker for macOS"
+authors = ["joeseesun <vista8@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/joeseesun/makemyday"
 edition = "2021"
 rust-version = "1.77.2"
 

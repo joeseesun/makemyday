@@ -36,3 +36,51 @@ button {
 button:active {
   transform: scale(0.97);
 }
+
+/* Confetti celebration animation */
+.confetti-container {
+  position: relative;
+  height: 32px;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  opacity: 0;
+  animation: confetti-burst 2s ease-out 1 forwards;
+}
+
+.confetti-piece:nth-child(odd) {
+  width: 4px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.confetti-piece:nth-child(3n) {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) scale(0.5);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-18px) rotate(60deg) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-8px) rotate(180deg) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(12px) rotate(360deg) scale(0.3);
+  }
+}
