@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# MakeMyDay
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个「以今天为中心」的习惯追踪桌面应用。不追求复杂的数据分析，只关注一件事：**今天，你做了吗？**
 
-Currently, two official plugins are available:
+## 功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **今日打卡** — 打开即看到今天的习惯清单，一键完成
+- **连续统计** — 当前连续天数、最长纪录、总完成次数
+- **年度日历** — GitHub 风格热力图，一眼看到全年坚持情况
+- **习惯管理** — 自由添加/删除/排序你的习惯项
+- **系统托盘** — 常驻 macOS 菜单栏，随时唤起
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **桌面框架**: Tauri 2.0（Rust 后端）
+- **前端**: React 19 + TypeScript
+- **样式**: TailwindCSS v4
+- **数据库**: SQLite（本地存储，数据不上云）
 
-## Expanding the ESLint configuration
+## 安装
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+前往 [Releases](https://github.com/joeseesun/makemyday/releases) 下载最新版本的 `.dmg` 文件，拖入 Applications 即可使用。
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+> 目前仅提供 macOS Apple Silicon (arm64) 版本。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 本地开发
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 安装依赖
+pnpm install
+
+# 开发模式
+pnpm tauri dev
+
+# 构建发布版
+pnpm tauri build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**前置要求**: Node.js 20+、pnpm、Rust toolchain
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 截图
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+（待补充）
+
+## 关注作者
+
+如果这个项目对你有帮助，欢迎关注我获取更多技术分享：
+
+- **X (Twitter)**: [@vista8](https://x.com/vista8)
+- **微信公众号「向阳乔木推荐看」**:
+
+<p align="center">
+  <img src="https://github.com/joeseesun/terminal-boost/raw/main/assets/wechat-qr.jpg?raw=true" alt="向阳乔木推荐看公众号二维码" width="300">
+</p>
+
+## License
+
+MIT
