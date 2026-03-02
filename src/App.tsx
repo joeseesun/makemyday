@@ -42,8 +42,13 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--color-surface)] px-6 py-5">
+    <div className="min-h-[100dvh] bg-[var(--color-surface)] px-6 pt-10 pb-5">
       <div className="max-w-3xl mx-auto">
+        {/* Draggable title bar region */}
+        <div
+          data-tauri-drag-region
+          className="fixed top-0 left-0 right-0 h-10 z-50"
+        />
         {/* Header — minimal */}
         <header className="flex items-center justify-between mb-5">
           <div>

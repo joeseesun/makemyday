@@ -40,10 +40,7 @@ async function initTables() {
   );
   if (count[0].cnt === 0) {
     const defaults = [
-      { name: "写作", emoji: "pencil", color: "#6366f1" },
-      { name: "运动", emoji: "bolt", color: "#10b981" },
       { name: "阅读", emoji: "book", color: "#f59e0b" },
-      { name: "编程", emoji: "code", color: "#3b82f6" },
     ];
     for (let i = 0; i < defaults.length; i++) {
       const h = defaults[i];

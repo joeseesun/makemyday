@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   type Habit,
   getCheckInsForYear,
@@ -52,6 +52,7 @@ export default function YearCalendar({
   const [checkIns, setCheckIns] = useState<Map<string, number[]>>(new Map());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const months = useMemo(() => generateYearCalendar(year), [year]);
   const today = formatDate(new Date());
   const currentMonth = new Date().getMonth();
@@ -65,6 +66,18 @@ export default function YearCalendar({
   useEffect(() => {
     loadCheckIns();
   }, [loadCheckIns, refreshKey]);
+
+  // Close popover when clicking outside
+  useEffect(() => {
+    if (!selectedDate) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+        setSelectedDate(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [selectedDate]);
 
   const handleToggle = async (date: string, habitId: number) => {
     await toggleCheckIn(date, habitId);
@@ -87,7 +100,7 @@ export default function YearCalendar({
   const hiddenCount = isCurrentYear && !showAll ? months.length - visibleMonths.length : 0;
 
   return (
-    <div>
+    <div ref={calendarRef}>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {visibleMonths.map((m) => (
           <MonthGrid
