@@ -40,7 +40,9 @@ pnpm tauri build
 
 ## 截图
 
-（待补充）
+<p align="center">
+  <img src="./assets/screenshot.png" alt="MakeMyDay 应用截图" width="600">
+</p>
 
 ## 关注作者
 
